@@ -17,6 +17,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final passwordController = TextEditingController();
   final isLogin = ValueNotifier<bool>(true);
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  bool _isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -28,6 +30,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -39,6 +44,8 @@ class _AuthScreenState extends State<AuthScreen> {
       errorMessage = await authProvider.signup(email, password, context);
     }
 
+    setState(() => _isLoading = false);
+
     if (errorMessage == null) {
       emailController.clear();
       passwordController.clear();
@@ -46,8 +53,10 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
+    setState(() => _isGoogleLoading = true);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.signInWithGoogle(context);
+    setState(() => _isGoogleLoading = false);
   }
 
   @override
@@ -104,7 +113,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         width: double.infinity,
                         height: 45.h,
                         child: ElevatedButton(
-                          onPressed: _submit,
+                          onPressed: _isLoading ? null : _submit,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue.shade600,
                             foregroundColor: Colors.white,
@@ -116,7 +125,16 @@ class _AuthScreenState extends State<AuthScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          child: Text(login ? 'Login' : 'Sign Up'),
+                          child: _isLoading
+                              ? SizedBox(
+                            width: 24.w,
+                            height: 24.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                              : Text(login ? 'Login' : 'Sign Up'),
                         ),
                       ),
                       SizedBox(height: 16.h),
@@ -134,15 +152,24 @@ class _AuthScreenState extends State<AuthScreen> {
                         width: double.infinity,
                         height: 45.h,
                         child: OutlinedButton.icon(
-                          onPressed: _signInWithGoogle,
+                          onPressed: _isGoogleLoading ? null : _signInWithGoogle,
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.grey.shade300),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                           ),
-                          icon: Image.asset(
-                            'assets/icons/google.png', // add a small Google logo
+                          icon: _isGoogleLoading
+                              ? SizedBox(
+                            width: 20.w,
+                            height: 20.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.grey.shade700,
+                            ),
+                          )
+                              : Image.asset(
+                            'assets/images/img.png',
                             width: 22.w,
                             height: 22.w,
                           ),
@@ -182,3 +209,4 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
+
