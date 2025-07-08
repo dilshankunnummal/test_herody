@@ -38,10 +38,10 @@ dependencies:
   flutter_screenutil: ^5.9.3
   firebase_core: ^3.15.1
   firebase_auth: ^5.6.2
-  http: ^1.4.0
   shared_preferences: ^2.5.3
   firebase_database: ^11.3.9
   google_fonts: ^6.1.0
+  google_sign_in: ^6.1.4
 
 dev_dependencies:
   flutter_test:
@@ -65,3 +65,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+
+  assets:
+    - assets/images/img.png

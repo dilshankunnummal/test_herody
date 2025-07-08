@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_app/common/auth_exception_handler.dart';
 import 'package:to_do_app/widgets/logout_confirmation_dialog.dart';
 
 class AuthProvider with ChangeNotifier {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   String? _token;
   String? _userId;
 
@@ -18,8 +22,10 @@ class AuthProvider with ChangeNotifier {
 
   Future<String?> signup(String email, String password, BuildContext context) async {
     try {
-      final userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       _token = await userCredential.user?.getIdToken();
       _userId = userCredential.user?.uid;
       notifyListeners();
@@ -30,15 +36,18 @@ class AuthProvider with ChangeNotifier {
       _showError(context, errorMessage);
       return errorMessage;
     } catch (_) {
-      _showError(context, 'Something went wrong. Please try again.');
-      return 'Something went wrong. Please try again.';
+      const fallback = 'Something went wrong. Please try again.';
+      _showError(context, fallback);
+      return fallback;
     }
   }
 
   Future<String?> login(String email, String password, BuildContext context) async {
     try {
-      final userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       _token = await userCredential.user?.getIdToken();
       _userId = userCredential.user?.uid;
       notifyListeners();
@@ -49,13 +58,39 @@ class AuthProvider with ChangeNotifier {
       _showError(context, errorMessage);
       return errorMessage;
     } catch (_) {
+      const fallback = 'Something went wrong. Please try again.';
+      _showError(context, fallback);
+      return fallback;
+    }
+  }
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      _token = await userCredential.user?.getIdToken();
+      _userId = userCredential.user?.uid;
+      notifyListeners();
+      await _saveToPrefs();
+    } on FirebaseAuthException catch (e) {
+      final errorMessage = AuthExceptionHandler.getMessageFromErrorCode(e.code);
+      _showError(context, errorMessage);
+    } catch (_) {
       _showError(context, 'Something went wrong. Please try again.');
-      return 'Something went wrong. Please try again.';
     }
   }
 
   Future<void> logout() async {
-    await FirebaseAuth.instance.signOut();
+    await _firebaseAuth.signOut();
+    await _googleSignIn.signOut();
     _token = null;
     _userId = null;
     notifyListeners();

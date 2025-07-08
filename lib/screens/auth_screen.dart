@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:to_do_app/widgets/custom_text_firld.dart';
+import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/custom_text_firld.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -28,7 +28,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -46,6 +45,11 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.signInWithGoogle(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +58,6 @@ class _AuthScreenState extends State<AuthScreen> {
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Container(
-            width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 24.w),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -89,7 +92,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         controller: emailController,
                         label: 'Email',
                         keyboardType: TextInputType.emailAddress,
-                        // Add validation inside CustomTextField or here with validator:
                       ),
                       SizedBox(height: 16.h),
                       CustomTextField(
@@ -115,6 +117,43 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ),
                           child: Text(login ? 'Login' : 'Sign Up'),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      Center(
+                        child: Text(
+                          'or',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45.h,
+                        child: OutlinedButton.icon(
+                          onPressed: _signInWithGoogle,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.grey.shade300),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          icon: Image.asset(
+                            'assets/icons/google.png', // add a small Google logo
+                            width: 22.w,
+                            height: 22.w,
+                          ),
+                          label: Text(
+                            'Continue with Google',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15.sp,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(height: 12.h),
