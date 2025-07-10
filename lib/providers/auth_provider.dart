@@ -11,10 +11,12 @@ class AuthProvider with ChangeNotifier {
 
   String? _token;
   String? _userId;
+  User? _currentUser;
 
   String? get token => _token;
   String? get userId => _userId;
   bool get isAuth => _token != null;
+  User? get currentUser => _currentUser;
 
   AuthProvider() {
     _tryAutoLogin();
@@ -28,6 +30,7 @@ class AuthProvider with ChangeNotifier {
       );
       _token = await userCredential.user?.getIdToken();
       _userId = userCredential.user?.uid;
+      _currentUser = userCredential.user;
       notifyListeners();
       await _saveToPrefs();
       return null;
@@ -50,6 +53,7 @@ class AuthProvider with ChangeNotifier {
       );
       _token = await userCredential.user?.getIdToken();
       _userId = userCredential.user?.uid;
+      _currentUser = userCredential.user;
       notifyListeners();
       await _saveToPrefs();
       return null;
@@ -78,6 +82,7 @@ class AuthProvider with ChangeNotifier {
       final userCredential = await _firebaseAuth.signInWithCredential(credential);
       _token = await userCredential.user?.getIdToken();
       _userId = userCredential.user?.uid;
+      _currentUser = userCredential.user;
       notifyListeners();
       await _saveToPrefs();
     } on FirebaseAuthException catch (e) {
@@ -93,6 +98,7 @@ class AuthProvider with ChangeNotifier {
     await _googleSignIn.signOut();
     _token = null;
     _userId = null;
+    _currentUser = null;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
@@ -112,6 +118,7 @@ class AuthProvider with ChangeNotifier {
     if (token != null && token.isNotEmpty && userId != null && userId.isNotEmpty) {
       _token = token;
       _userId = userId;
+      _currentUser = _firebaseAuth.currentUser;
       notifyListeners();
     }
   }

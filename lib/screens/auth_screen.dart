@@ -125,16 +125,17 @@ class _AuthScreenState extends State<AuthScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          child: _isLoading
-                              ? SizedBox(
-                            width: 24.w,
-                            height: 24.w,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Colors.white,
-                            ),
-                          )
-                              : Text(login ? 'Login' : 'Sign Up'),
+                          child:
+                              _isLoading
+                                  ? SizedBox(
+                                    width: 24.w,
+                                    height: 24.w,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                  : Text(login ? 'Login' : 'Sign Up'),
                         ),
                       ),
                       SizedBox(height: 16.h),
@@ -152,27 +153,29 @@ class _AuthScreenState extends State<AuthScreen> {
                         width: double.infinity,
                         height: 45.h,
                         child: OutlinedButton.icon(
-                          onPressed: _isGoogleLoading ? null : _signInWithGoogle,
+                          onPressed:
+                              _isGoogleLoading ? null : _signInWithGoogle,
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.grey.shade300),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                           ),
-                          icon: _isGoogleLoading
-                              ? SizedBox(
-                            width: 20.w,
-                            height: 20.w,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Colors.grey.shade700,
-                            ),
-                          )
-                              : Image.asset(
-                            'assets/images/img.png',
-                            width: 22.w,
-                            height: 22.w,
-                          ),
+                          icon:
+                              _isGoogleLoading
+                                  ? SizedBox(
+                                    width: 20.w,
+                                    height: 20.w,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  )
+                                  : Image.asset(
+                                    'assets/images/img.png',
+                                    width: 22.w,
+                                    height: 22.w,
+                                  ),
                           label: Text(
                             'Continue with Google',
                             style: GoogleFonts.poppins(
@@ -209,4 +212,3 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
-
